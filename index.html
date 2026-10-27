@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master SQL Quiz - DML, DQL, DDL & JOINs</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .code-snippet {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetToHome()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid font-bold fa-database text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">SQL Master Quiz</h1>
+                    <p class="text-xs text-slate-400">DDL • DML • DQL • JOINs • Agregações</p>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center gap-3">
+                <span id="scoreBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span id="headerScore">Acertos: 0</span>
+                </span>
+                <button onclick="resetToHome()" class="px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                    <i class="fa-solid fa-house mr-1"></i> Início
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+        <!-- SCREEN 1: WELCOME & CATEGORY SELECTION -->
+        <section id="welcomeScreen" class="space-y-8 py-4">
+            <div class="text-center space-y-4 max-w-2xl mx-auto">
+                <span class="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                    Plataforma do Aluno
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                    Test e Aprimore seus Conhecimentos em <span class="text-blue-500">SQL</span>
+                </h2>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+                    Domine comandos DDL, DML, DQL e junções complexas (JOINs). Com 30 questões comentadas com explicações detalhadas para cada erro e acerto!
+                </p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-800">
+                    <p class="text-2xl font-bold text-blue-400">30</p>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider mt-1">Questões Totais</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-800">
+                    <p class="text-2xl font-bold text-emerald-400">4</p>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider mt-1">Categorias</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-800">
+                    <p class="text-2xl font-bold text-indigo-400">JOINs</p>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider mt-1">INNER, LEFT, RIGHT...</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-800">
+                    <p class="text-2xl font-bold text-amber-400">100%</p>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider mt-1">Comentado</p>
+                </div>
+            </div>
+
+            <!-- Filter Selection -->
+            <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-filter text-blue-400"></i> Selecione o Modo e Categoria
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="categoryFilters">
+                    <button onclick="selectCategory('ALL')" class="cat-btn active p-3 rounded-xl border border-blue-500/50 bg-blue-600/20 text-white text-left font-medium text-sm hover:border-blue-500 transition flex flex-col justify-between h-24">
+                        <i class="fa-solid fa-layer-group text-lg text-blue-400"></i>
+                        <span>Todas (30)</span>
+                    </button>
+                    <button onclick="selectCategory('DDL')" class="cat-btn p-3 rounded-xl border border-slate-700 bg-slate-800/60 text-slate-300 text-left font-medium text-sm hover:border-slate-500 transition flex flex-col justify-between h-24">
+                        <i class="fa-solid fa-screwdriver-wrench text-lg text-purple-400"></i>
+                        <div>
+                            <p class="font-bold">DDL</p>
+                            <p class="text-xs text-slate-400">CREATE, ALTER, DROP...</p>
+                        </div>
+                    </button>
+                    <button onclick="selectCategory('DML')" class="cat-btn p-3 rounded-xl border border-slate-700 bg-slate-800/60 text-slate-300 text-left font-medium text-sm hover:border-slate-500 transition flex flex-col justify-between h-24">
+                        <i class="fa-solid fa-pen-to-square text-lg text-emerald-400"></i>
+                        <div>
+                            <p class="font-bold">DML</p>
+                            <p class="text-xs text-slate-400">INSERT, UPDATE, DELETE</p>
+                        </div>
+                    </button>
+                    <button onclick="selectCategory('DQL')" class="cat-btn p-3 rounded-xl border border-slate-700 bg-slate-800/60 text-slate-300 text-left font-medium text-sm hover:border-slate-500 transition flex flex-col justify-between h-24">
+                        <i class="fa-solid fa-magnifying-glass text-lg text-amber-400"></i>
+                        <div>
+                            <p class="font-bold">DQL</p>
+                            <p class="text-xs text-slate-400">SELECT, WHERE, GROUP BY</p>
+                        </div>
+                    </button>
+                    <button onclick="selectCategory('JOINS')" class="cat-btn p-3 rounded-xl border border-slate-700 bg-slate-800/60 text-slate-300 text-left font-medium text-sm hover:border-slate-500 transition flex flex-col justify-between h-24">
+                        <i class="fa-solid fa-diagram-project text-lg text-rose-400"></i>
+                        <div>
+                            <p class="font-bold">JOINs</p>
+                            <p class="text-xs text-slate-400">INNER, LEFT, RIGHT, FULL</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Start Action -->
+                <div class="pt-4 border-t border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                        <i class="fa-solid fa-circle-info text-blue-400"></i>
+                        <span>O feedback com erro/acerto é exibido imediatamente após cada questão.</span>
+                    </div>
+                    <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-center">
+                        Iniciar Quiz Agora <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: QUIZ INTERFACE -->
+        <section id="quizScreen" class="hidden space-y-6">
+            <!-- Top Progress Bar & Status -->
+            <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-800 space-y-3">
+                <div class="flex justify-between items-center text-xs font-semibold text-slate-400">
+                    <span id="questionCategoryBadge" class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wider">
+                        DQL
+                    </span>
+                    <span id="questionCounter" class="text-slate-300">Questão 1 de 30</span>
+                </div>
+                <div class="w-full bg-slate-700/50 h-2.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden">
+                <div class="space-y-4">
+                    <h3 id="questionText" class="text-lg sm:text-xl font-semibold text-white leading-relaxed">
+                        Texto da pergunta aqui...
+                    </h3>
+                    
+                    <!-- Code Snippet Box (Optional) -->
+                    <div id="codeContainer" class="hidden">
+                        <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-emerald-400 font-mono text-sm overflow-x-auto"><code id="codeText">SELECT * FROM tabela;</code></pre>
+                    </div>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <!-- Explanation Box (Shown after answering) -->
+                <div id="explanationBox" class="hidden p-5 rounded-xl border transition-all duration-300 space-y-3">
+                    <div class="flex items-center gap-2 font-bold text-sm" id="explanationHeader">
+                        <!-- Header icon & text inserted via JS -->
+                    </div>
+                    <p id="explanationText" class="text-slate-300 text-sm leading-relaxed">
+                        Explicação da resposta.
+                    </p>
+                </div>
+
+                <!-- Next Question Navigation Button -->
+                <div class="flex justify-end pt-2">
+                    <button id="nextBtn" onclick="nextQuestion()" disabled class="px-6 py-3 bg-slate-700 text-slate-400 cursor-not-allowed font-bold rounded-xl transition flex items-center gap-2">
+                        Próxima Questão <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: RESULTS & SCORE -->
+        <section id="resultsScreen" class="hidden space-y-8 py-6 text-center">
+            <div class="bg-slate-800/40 border border-slate-800 rounded-3xl p-8 max-w-2xl mx-auto space-y-6">
+                <div class="w-20 h-20 mx-auto rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-3xl">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-extrabold text-white">Quiz Concluído!</h2>
+                    <p class="text-slate-400 text-sm">Confira seu desempenho abaixo e revise os pontos fracos.</p>
+                </div>
+
+                <!-- Final Score Card -->
+                <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">Pontuação</p>
+                        <p id="finalScorePercent" class="text-3xl sm:text-4xl font-extrabold text-blue-400 mt-1">0%</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">Acertos</p>
+                        <p id="finalCorrectCount" class="text-3xl sm:text-4xl font-extrabold text-emerald-400 mt-1">0</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">Erros</p>
+                        <p id="finalWrongCount" class="text-3xl sm:text-4xl font-extrabold text-rose-400 mt-1">0</p>
+                    </div>
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="performanceMessage" class="p-4 rounded-xl text-sm font-medium">
+                    <!-- Message dynamically added -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+                    <button onclick="resetToHome()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Refazer ou Trocar Categoria
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        <p>SQL Master Quiz Platform • DML, DQL, DDL & JOINs • Desenvolvido para Estudos</p>
+    </footer>
+
+    <!-- QUIZ LOGIC & DATABASE DATA -->
+    <script>
+        // -------------------------------------------------------------
+        // DATABASE OF 30 DETAILED SQL QUESTIONS
+        // -------------------------------------------------------------
+        const sqlQuestions = [
+            // --- DDL (Data Definition Language) ---
+            {
+                category: "DDL",
+                question: "Qual comando SQL pertence à categoria DDL (Data Definition Language) e é utilizado para alterar a estrutura de uma tabela existente?",
+                code: null,
+                options: [
+                    "UPDATE",
+                    "ALTER TABLE",
+                    "MODIFY TABLE",
+                    "CHANGE STRUCTURE"
+                ],
+                correct: 1,
+                explanation: "O comando ALTER TABLE é da categoria DDL, usado para adicionar, remover ou modificar colunas/constraints de uma tabela existente. UPDATE é DML (altera dados, não estrutura)."
+            },
+            {
+                category: "DDL",
+                question: "Qual comando é usado para apagar **completamente** a estrutura de uma tabela e seus dados do banco de dados?",
+                code: null,
+                options: [
+                    "DELETE TABLE",
+                    "REMOVE TABLE",
+                    "TRUNCATE TABLE",
+                    "DROP TABLE"
+                ],
+                correct: 3,
+                explanation: "DROP TABLE exclui a tabela inteira e sua definição no esquema. TRUNCATE limpa apenas os registros mantendo a estrutura. DELETE exclui linhas via DML."
+            },
+            {
+                category: "DDL",
+                question: "O comando TRUNCATE TABLE remove todas as linhas de uma tabela. A qual sublinguagem do SQL ele pertence e qual sua principal característica frente ao DELETE?",
+                code: null,
+                options: [
+                    "Pertence ao DML e é mais lento que o DELETE.",
+                    "Pertence ao DDL, é mais rápido que DELETE e desaloca espaço de memória sem registrar log individual por linha.",
+                    "Pertence ao DQL e faz backup automático.",
+                    "Pertence ao DCL e remove permissões de acesso."
+                ],
+                correct: 1,
+                explanation: "TRUNCATE é um comando DDL. Ele redefine a estrutura apagando todos os dados de forma rápida por não gerar transações linha por linha (Undo log reduzido)."
+            },
+            {
+                category: "DDL",
+                question: "Qual restrição (Constraint) garante que uma coluna não aceite valores nulos e que cada valor seja único na tabela?",
+                code: null,
+                options: [
+                    "FOREIGN KEY",
+                    "DEFAULT",
+                    "PRIMARY KEY",
+                    "CHECK"
+                ],
+                correct: 2,
+                explanation: "PRIMARY KEY (Chave Primária) combina as propriedades NOT NULL e UNIQUE, identificando unicamente cada registro em uma tabela."
+            },
+            {
+                category: "DDL",
+                question: "Para criar um novo banco de dados no SQL, qual comando da DDL deve ser executado?",
+                code: "________ meubanco;",
+                options: [
+                    "NEW DATABASE",
+                    "CREATE DATABASE",
+                    "MAKE DATABASE",
+                    "BUILD DATABASE"
+                ],
+                correct: 1,
+                explanation: "O comando DDL correto para instanciar um banco de dados é CREATE DATABASE seguido do nome do banco."
+            },
+
+            // --- DML (Data Manipulation Language) ---
+            {
+                category: "DML",
+                question: "Qual comando DML é usado para inserir novos registros em uma tabela?",
+                code: null,
+                options: [
+                    "ADD ROW",
+                    "INSERT INTO",
+                    "UPDATE",
+                    "CREATE ROW"
+                ],
+                correct: 1,
+                explanation: "INSERT INTO é a instrução DML responsável por adicionar novas tuplas/linhas em uma tabela existente."
+            },
+            {
+                category: "DML",
+                question: "O que acontece se você executar o comando UPDATE sem a cláusula WHERE?",
+                code: "UPDATE funcionarios SET salario = 5000;",
+                options: [
+                    "O banco de dados exibe um erro de sintaxe.",
+                    "Apenas o primeiro registro é atualizado.",
+                    "TODOS os registros da tabela terão seus salários atualizados para 5000.",
+                    "Nenhum registro é alterado."
+                ],
+                correct: 2,
+                explanation: "Sem a cláusula WHERE para filtrar quais linhas devem sofrer alteração, o UPDATE afeta impreterivelmente TODAS as linhas da tabela!"
+            },
+            {
+                category: "DML",
+                question: "Qual das opções a seguir apresenta a sintaxe correta para remover o cliente com ID 10 da tabela 'clientes'?",
+                code: null,
+                options: [
+                    "DELETE FROM clientes WHERE id = 10;",
+                    "REMOVE FROM clientes WHERE id = 10;",
+                    "DROP FROM clientes WHERE id = 10;",
+                    "DELETE CLIENTS WHERE id = 10;"
+                ],
+                correct: 0,
+                explanation: "A sintaxe padrão DML para remoção de registros específicos é: DELETE FROM [nome_tabela] WHERE [condição]."
+            },
+            {
+                category: "DML",
+                question: "Qual a diferença fundamental entre as sublinguagens DDL e DML?",
+                code: null,
+                options: [
+                    "DDL lida com os dados inseridos e DML cria os usuários do banco.",
+                    "DDL define/altera a estrutura do banco (tabelas, colunas), enquanto DML manipula os dados armazenados nas tabelas.",
+                    "DDL é usada para consultas e DML para criação de índices.",
+                    "Ambas são idênticas e executam os mesmos comandos."
+                ],
+                correct: 1,
+                explanation: "DDL (Data Definition) altera esquema/estrutura (CREATE, ALTER, DROP). DML (Data Manipulation) altera os dados mantidos nessas estruturas (INSERT, UPDATE, DELETE)."
+            },
+            {
+                category: "DML",
+                question: "Como você atualiza o e-mail do usuário 'Ana' na tabela 'usuarios'?",
+                code: null,
+                options: [
+                    "UPDATE usuarios SET email = 'ana@mail.com' WHERE nome = 'Ana';",
+                    "CHANGE usuarios SET email = 'ana@mail.com' WHERE nome = 'Ana';",
+                    "MODIFY usuarios SET email = 'ana@mail.com' WHERE nome = 'Ana';",
+                    "UPDATE email = 'ana@mail.com' FROM usuarios WHERE nome = 'Ana';"
+                ],
+                correct: 0,
+                explanation: "A sintaxe padrão do UPDATE é: UPDATE [tabela] SET [coluna = novo_valor] WHERE [condicao]."
+            },
+
+            // --- DQL (Data Query Language) & Cláusulas ---
+            {
+                category: "DQL",
+                question: "A qual sublinguagem pertence o comando SELECT?",
+                code: null,
+                options: [
+                    "DDL (Data Definition Language)",
+                    "DML (Data Manipulation Language)",
+                    "DQL (Data Query Language)",
+                    "DCL (Data Control Language)"
+                ],
+                correct: 2,
+                explanation: "SELECT é o principal (e essencialmente o único) comando da DQL (Data Query Language), destinado exclusivamente à realização de consultas aos dados."
+            },
+            {
+                category: "DQL",
+                question: "Qual cláusula do SELECT é utilizada para filtrar registros agrupados que utilizam funções de agregação (como SUM, AVG, COUNT)?",
+                code: null,
+                options: [
+                    "WHERE",
+                    "HAVING",
+                    "ORDER BY",
+                    "GROUP BY"
+                ],
+                correct: 1,
+                explanation: "WHERE filtra linhas individuais ANTES do agrupamento. HAVING filtra os grupos DEPOIS que as funções de agregação foram aplicadas."
+            },
+            {
+                category: "DQL",
+                question: "Qual função de agregação SQL calcula a média dos valores de uma coluna numérica?",
+                code: null,
+                options: [
+                    "SUM()",
+                    "MEDIAN()",
+                    "AVG()",
+                    "COUNT()"
+                ],
+                correct: 2,
+                explanation: "AVG() vem de 'Average' e calcula a média aritmética dos valores de uma coluna."
+            },
+            {
+                category: "DQL",
+                question: "Qual comando é utilizado para eliminar registros duplicados no resultado de uma consulta SELECT?",
+                code: "SELECT ________ cidade FROM clientes;",
+                options: [
+                    "UNIQUE",
+                    "DISTINCT",
+                    "DIFFERENT",
+                    "SINGLE"
+                ],
+                correct: 1,
+                explanation: "A palavra-chave DISTINCT retira valores repetidos no conjunto de resultados retornado pelo SELECT."
+            },
+            {
+                category: "DQL",
+                question: "Qual operador deve ser utilizado com a cláusula WHERE para buscar padrões de texto usando caracteres curinga como '% '?",
+                code: "SELECT * FROM produtos WHERE nome _____ 'Camisa%';",
+                options: [
+                    "EQUAL",
+                    "MATCHES",
+                    "LIKE",
+                    "CONTAINS"
+                ],
+                correct: 2,
+                explanation: "O operador LIKE permite pesquisa por padrões em cadeias de caracteres. O símbolo '%' representa zero ou mais caracteres."
+            },
+            {
+                category: "DQL",
+                question: "Qual a ordem lógica correta de execução/escrita de uma consulta SQL com agregação?",
+                code: null,
+                options: [
+                    "SELECT -> WHERE -> FROM -> HAVING -> GROUP BY",
+                    "SELECT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY",
+                    "FROM -> SELECT -> GROUP BY -> WHERE -> HAVING",
+                    "SELECT -> GROUP BY -> HAVING -> FROM -> WHERE"
+                ],
+                correct: 1,
+                explanation: "A ordem de escrita é: SELECT -> FROM -> [JOINs] -> WHERE -> GROUP BY -> HAVING -> ORDER BY."
+            },
+            {
+                category: "DQL",
+                question: "O que a consulta a seguir retornará?",
+                code: "SELECT COUNT(*) FROM alunos WHERE nota IS NULL;",
+                options: [
+                    "O valor total acumulado das notas dos alunos.",
+                    "A quantidade total de alunos que NÃO possuem nota cadastrada (nota nula).",
+                    "Um erro de sintaxe, pois IS NULL é inválido.",
+                    "A lista com os nomes dos alunos sem nota."
+                ],
+                correct: 1,
+                explanation: "COUNT(*) conta o número de registros encontrados pela instrução. O WHERE filtra aqueles em que a coluna 'nota' tem valor nulo (IS NULL)."
+            },
+            {
+                category: "DQL",
+                question: "Qual operador é usado para verificar se um valor está presente em uma lista de valores fornecida?",
+                code: "SELECT * FROM produtos WHERE categoria ____ ('Eletrônicos', 'Games');",
+                options: [
+                    "BETWEEN",
+                    "IN",
+                    "EXISTS",
+                    "CONTAINS"
+                ],
+                correct: 1,
+                explanation: "O operador IN verifica se o valor da coluna corresponde a qualquer um dos itens na lista especificada."
+            },
+            {
+                category: "DQL",
+                question: "Para ordenar os resultados do maior para o menor (ordem decrescente), qual instrução é adicionada ao final da consulta?",
+                code: "SELECT * FROM produtos ORDER BY preco ____;",
+                options: [
+                    "ASC",
+                    "DESC",
+                    "DOWN",
+                    "HIGH"
+                ],
+                correct: 1,
+                explanation: "ORDER BY [coluna] DESC ordena os dados de forma decrescente. O padrão quando omitido é ASC (crescente)."
+            },
+
+            // --- JOINs & Relacionamentos ---
+            {
+                category: "JOINS",
+                question: "Qual tipo de JOIN retorna **apenas** as linhas que possuem correspondência em ambas as tabelas?",
+                code: null,
+                options: [
+                    "LEFT JOIN",
+                    "RIGHT JOIN",
+                    "FULL OUTER JOIN",
+                    "INNER JOIN"
+                ],
+                correct: 3,
+                explanation: "INNER JOIN busca e traz exclusivamente a interseção dos dados: os registros que possuem chave/correspondência nas duas tabelas envolvidas."
+            },
+            {
+                category: "JOINS",
+                question: "Se executarmos um **LEFT JOIN** entre a tabela A (esquerda) e a tabela B (direita), o que será retornado se um registro de A não tiver correspondente em B?",
+                code: null,
+                options: [
+                    "O registro de A será descartado.",
+                    "O banco dará um erro de chave estrangeira.",
+                    "O registro de A será retornado e as colunas relativas à tabela B virão preenchidas com NULL.",
+                    "A consulta retornará apenas a tabela B."
+                ],
+                correct: 2,
+                explanation: "O LEFT JOIN preserva TODOS os registros da tabela à esquerda (A). Se não houver par na tabela à direita (B), o SQL preenche os dados de B com NULL."
+            },
+            {
+                category: "JOINS",
+                question: "Análise a consulta abaixo. Qual o objetivo do **RIGHT JOIN** neste caso?",
+                code: "SELECT * FROM pedidos P RIGHT JOIN clientes C ON P.cliente_id = C.id;",
+                options: [
+                    "Trazer todos os pedidos, mesmo os que não têm cliente.",
+                    "Trazer todos os clientes, inclusive aqueles que NUNCA fizeram nenhum pedido.",
+                    "Trazer apenas os clientes que possuem mais de 10 pedidos.",
+                    "O mesmo que um INNER JOIN, sem diferenças."
+                ],
+                correct: 1,
+                explanation: "O RIGHT JOIN prioriza a tabela da direita ('clientes'). Assim, todos os clientes serão exibidos, mesmo que não tenham nenhum pedido associado (colunas de 'pedidos' virão NULL)."
+            },
+            {
+                category: "JOINS",
+                question: "O que é um **CROSS JOIN** em SQL?",
+                code: null,
+                options: [
+                    "Um JOIN que junta três tabelas simultaneamente.",
+                    "Um JOIN que calcula o produto cartesiano entre duas tabelas (combina cada linha da 1ª com todas as linhas da 2ª).",
+                    "Um tipo de JOIN usado apenas em bancos Não-Relacionais.",
+                    "Um JOIN exclusivo para tabelas sem chave primária."
+                ],
+                correct: 1,
+                explanation: "O CROSS JOIN gera o produto cartesiano das duas tabelas. Se a Tabela A tem 10 linhas e a Tabela B tem 5 linhas, o resultado terá 50 linhas."
+            },
+            {
+                category: "JOINS",
+                question: "Qual junção retorna todos os registros quando há uma correspondência em qualquer uma das tabelas (A ou B), trazendo NULL para os lados onde não há correspondência?",
+                code: null,
+                options: [
+                    "INNER JOIN",
+                    "FULL OUTER JOIN",
+                    "CROSS JOIN",
+                    "SELF JOIN"
+                ],
+                correct: 1,
+                explanation: "FULL OUTER JOIN (ou FULL JOIN) combina o resultado do LEFT JOIN com o RIGHT JOIN: preserva linhas de ambas as tabelas independente de correspondência."
+            },
+            {
+                category: "JOINS",
+                question: "Como é chamado o JOIN onde uma tabela é juntada com **ela mesma**?",
+                code: "SELECT A.nome AS Funcionario, B.nome AS Gerente FROM funcionarios A JOIN funcionarios B ON A.gerente_id = B.id;",
+                options: [
+                    "AUTO JOIN",
+                    "SELF JOIN",
+                    "SAME JOIN",
+                    "REF JOIN"
+                ],
+                correct: 1,
+                explanation: "SELF JOIN é uma junção regular na qual uma tabela é relacionada com ela mesma, geralmente usando aliases (apelidos) para diferençar as instâncias."
+            },
+            {
+                category: "JOINS",
+                question: "Na cláusula de junção de tabelas, qual palavra-chave é usada para especificar a condição de igualdade das chaves?",
+                code: "SELECT * FROM clientes C JOIN pedidos P _____ C.id = P.cliente_id;",
+                options: [
+                    "WHERE",
+                    "HAVING",
+                    "ON",
+                    "USING_KEY"
+                ],
+                correct: 2,
+                explanation: "A cláusula ON é usada logo após o tipo de JOIN para declarar a condição de ligação entre os campos das tabelas (ex: ON tabela1.id = tabela2.fk)."
+            },
+            {
+                category: "JOINS",
+                question: "Se a tabela 'Categorias' tem 4 linhas e a tabela 'Produtos' tem 10 linhas, quantas linhas o SELECT abaixo retornará?",
+                code: "SELECT * FROM categorias CROSS JOIN produtos;",
+                options: [
+                    "14 linhas",
+                    "40 linhas",
+                    "10 linhas",
+                    "4 linhas"
+                ],
+                correct: 1,
+                explanation: "CROSS JOIN realiza o produto cartesiano: 4 x 10 = 40 linhas."
+            },
+            {
+                category: "JOINS",
+                question: "Como você filtraria um LEFT JOIN para encontrar **apenas** os registros da tabela da esquerda que NÃO têm correspondência na tabela da direita?",
+                code: null,
+                options: [
+                    "Usando a condição 'WHERE tabela_direita.id IS NULL'",
+                    "Usando a instrução 'NOT JOIN'",
+                    "Usando 'HAVING COUNT(*) = 0'",
+                    "Substituindo o LEFT JOIN por INNER JOIN"
+                ],
+                correct: 0,
+                explanation: "Ao fazer LEFT JOIN e adicionar no WHERE que a chave da tabela da direita 'IS NULL', filtramos e obtemos apenas as linhas exclusivas do lado esquerdo (Anti-JOIN)."
+            },
+
+            // --- Outros / Subqueries e DCL ---
+            {
+                category: "DQL",
+                question: "O que é uma Subquery (ou Subconsulta) em SQL?",
+                code: "SELECT nome FROM funcionarios WHERE salario > (SELECT AVG(salario) FROM funcionarios);",
+                options: [
+                    "Um comando DDL para criar sub-tabelas temporárias.",
+                    "Uma consulta SELECT aninhada dentro de outra instrução SQL.",
+                    "Um erro de sintaxe quando se usa dois SELECTs no mesmo script.",
+                    "Um recurso para conectar dois bancos de dados diferentes."
+                ],
+                correct: 1,
+                explanation: "Subquery é uma consulta SQL embutida no WHERE, FROM ou HAVING de outra consulta principal para calcular/fornecer dados intermediários."
+            },
+            {
+                category: "DDL",
+                question: "Qual comando DCL (Data Control Language) é usado para conceder permissões de acesso a um usuário no banco de dados?",
+                code: null,
+                options: [
+                    "ALLOW",
+                    "GRANT",
+                    "REVOKE",
+                    "PERMIT"
+                ],
+                correct: 1,
+                explanation: "GRANT concede privilégios de acesso aos objetos do banco de dados a usuários ou papéis (roles). REVOKE remove esses privilégios."
+            }
+        ];
+
+        // -------------------------------------------------------------
+        // GAME STATE MANAGEMENT
+        // -------------------------------------------------------------
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+        let selectedCategoryFilter = 'ALL';
+
+        // -------------------------------------------------------------
+        // UI & SCREEN NAVIGATION
+        // -------------------------------------------------------------
+        function selectCategory(cat) {
+            selectedCategoryFilter = cat;
+            
+            // Highlight active button
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-600/20', 'active');
+                btn.classList.add('border-slate-700', 'bg-slate-800/60');
+            });
+
+            event.currentTarget.classList.remove('border-slate-700', 'bg-slate-800/60');
+            event.currentTarget.classList.add('border-blue-500', 'bg-blue-600/20', 'active');
+        }
+
+        function startQuiz() {
+            // Filter questions based on selection
+            if (selectedCategoryFilter === 'ALL') {
+                currentQuestions = [...sqlQuestions];
+            } else {
+                currentQuestions = sqlQuestions.filter(q => q.category === selectedCategoryFilter);
+            }
+
+            // Shuffle questions for variety
+            currentQuestions.sort(() => Math.random() - 0.5);
+
+            currentIndex = 0;
+            score = 0;
+            userAnswers = [];
+
+            // Update UI Counters
+            document.getElementById('scoreBadge').classList.remove('hidden');
+            updateHeaderScore();
+
+            // Switch screens
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = currentQuestions[currentIndex];
+
+            // Reset options & UI state
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('nextBtn').className = "px-6 py-3 bg-slate-700 text-slate-400 cursor-not-allowed font-bold rounded-xl transition flex items-center gap-2";
+            
+            document.getElementById('explanationBox').classList.add('hidden');
+            
+            // Progress Bar & Question Counter
+            const progressPercent = ((currentIndex) / currentQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+            document.getElementById('questionCounter').innerText = `Questão ${currentIndex + 1} de ${currentQuestions.length}`;
+            document.getElementById('questionCategoryBadge').innerText = q.category;
+
+            // Set text
+            document.getElementById('questionText').innerText = q.question;
+
+            // Code block rendering
+            const codeContainer = document.getElementById('codeContainer');
+            if (q.code) {
+                document.getElementById('codeText').innerText = q.code;
+                codeContainer.classList.remove('hidden');
+            } else {
+                codeContainer.classList.add('hidden');
+            }
+
+            // Render options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-700/60 hover:border-slate-500 transition-all font-medium text-sm sm:text-base text-slate-200 flex items-start gap-3 group`;
+                btn.onclick = () => checkAnswer(idx);
+                
+                const letterBadge = document.createElement('span');
+                letterBadge.className = `w-6 h-6 rounded-lg bg-slate-700 group-hover:bg-blue-600 text-slate-300 group-hover:text-white text-xs font-bold flex items-center justify-center flex-shrink-0 transition-colors`;
+                letterBadge.innerText = String.fromCharCode(65 + idx); // A, B, C, D
+
+                const textSpan = document.createElement('span');
+                textSpan.innerText = opt;
+
+                btn.appendChild(letterBadge);
+                btn.appendChild(textSpan);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            const q = currentQuestions[currentIndex];
+            const optionButtons = document.querySelectorAll('.option-btn');
+
+            // Disable all buttons to prevent multiple selections
+            optionButtons.forEach(btn => btn.disabled = true);
+
+            const isCorrect = (selectedIndex === q.correct);
+
+            if (isCorrect) {
+                score++;
+                updateHeaderScore();
+            }
+
+            // Record user answer
+            userAnswers.push({
+                question: q.question,
+                selected: selectedIndex,
+                correct: q.correct,
+                isCorrect: isCorrect
+            });
+
+            // Highlight Options
+            optionButtons.forEach((btn, idx) => {
+                if (idx === q.correct) {
+                    // Correct answer style
+                    btn.classList.remove('border-slate-700', 'bg-slate-800/50');
+                    btn.classList.add('border-emerald-500', 'bg-emerald-500/10', 'text-emerald-300', 'font-bold');
+                    btn.querySelector('span').classList.add('bg-emerald-500', 'text-white');
+                } else if (idx === selectedIndex && !isCorrect) {
+                    // Wrong selection style
+                    btn.classList.remove('border-slate-700', 'bg-slate-800/50');
+                    btn.classList.add('border-rose-500', 'bg-rose-500/10', 'text-rose-300');
+                    btn.querySelector('span').classList.add('bg-rose-500', 'text-white');
+                } else {
+                    btn.classList.add('opacity-40');
+                }
+            });
+
+            // Show Detailed Explanation
+            showExplanation(isCorrect, q.explanation);
+
+            // Enable Next Button
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = false;
+            nextBtn.className = "px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer transform hover:-translate-y-0.5";
+        }
+
+        function showExplanation(isCorrect, explanationText) {
+            const box = document.getElementById('explanationBox');
+            const header = document.getElementById('explanationHeader');
+            const text = document.getElementById('explanationText');
+
+            box.classList.remove('hidden', 'border-emerald-500/30', 'bg-emerald-500/5', 'border-rose-500/30', 'bg-rose-500/5');
+
+            if (isCorrect) {
+                box.classList.add('border-emerald-500/30', 'bg-emerald-500/5');
+                header.className = "flex items-center gap-2 font-bold text-sm text-emerald-400";
+                header.innerHTML = `<i class="fa-solid fa-circle-check text-lg"></i> Resposta Correta!`;
+            } else {
+                box.classList.add('border-rose-500/30', 'bg-rose-500/5');
+                header.className = "flex items-center gap-2 font-bold text-sm text-rose-400";
+                header.innerHTML = `<i class="fa-solid fa-circle-xmark text-lg"></i> Resposta Incorreta! Veja a explicação abaixo:`;
+            }
+
+            text.innerText = explanationText;
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < currentQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateHeaderScore() {
+            document.getElementById('headerScore').innerText = `Acertos: ${score}/${currentQuestions.length}`;
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            const total = currentQuestions.length;
+            const wrong = total - score;
+            const percentage = Math.round((score / total) * 100);
+
+            document.getElementById('finalScorePercent').innerText = `${percentage}%`;
+            document.getElementById('finalCorrectCount').innerText = score;
+            document.getElementById('finalWrongCount').innerText = wrong;
+
+            const msgBox = document.getElementById('performanceMessage');
+            if (percentage >= 80) {
+                msgBox.className = "p-4 rounded-xl text-sm font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-300";
+                msgBox.innerHTML = `<i class="fa-solid fa-star mr-1"></i> <strong>Excelente Desempenho!</strong> Você demonstra excelente domínio dos comandos SQL, JOINs e sublinguagens.`;
+            } else if (percentage >= 50) {
+                msgBox.className = "p-4 rounded-xl text-sm font-medium bg-amber-500/10 border border-amber-500/20 text-amber-300";
+                msgBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>Bom Trabalho!</strong> Você tem uma boa base, mas vale a pena revisar conceitos de JOINs e DDL para fixar totalmente.`;
+            } else {
+                msgBox.className = "p-4 rounded-xl text-sm font-medium bg-rose-500/10 border border-rose-500/20 text-rose-300";
+                msgBox.innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> <strong>Precisa Praticar Mais!</strong> Revise a diferença entre DDL e DML, e estude os relacionamentos INNER e LEFT JOIN.`;
+            }
+        }
+
+        function resetToHome() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('scoreBadge').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
